@@ -7,6 +7,7 @@ import (
 
 	"github.com/CesarDGN95/bepost/awsgo"
 	"github.com/CesarDGN95/bepost/bd"
+	"github.com/CesarDGN95/bepost/handlers"
 	"github.com/CesarDGN95/bepost/models"
 	"github.com/CesarDGN95/bepost/secretmanager"
 	"github.com/aws/aws-lambda-go/events"
@@ -68,6 +69,20 @@ func EjecutoLambda(ctx context.Context, request events.APIGatewayProxyRequest) (
 			},
 		}
 		return res, nil
+	}
+
+	respApi := handlers.Manejadores(awsgo.Ctx, request)
+	if respApi.CustomResp == nil {
+		res = &events.APIGatewayProxyResponse{
+			StatusCode: respApi.Status,
+			Body:       respApi.Message,
+			Headers: map[string]string{
+				"Content-type": "application/json",
+			},
+		}
+		return res, nil
+	} else {
+		return respApi.CustomResp, nil
 	}
 
 }
